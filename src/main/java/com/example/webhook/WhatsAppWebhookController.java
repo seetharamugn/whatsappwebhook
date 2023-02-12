@@ -24,6 +24,10 @@ public class WhatsAppWebhookController {
             }
         }
 
+    @GetMapping("/")
+    public String hokme() {
+       return "heelo";
+    }
     @PostMapping("/webhook")
     public ResponseEntity<Void> handleIncomingMessage(@RequestBody String messageBody) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
