@@ -107,11 +107,11 @@ public class WhatsAppWebhookController {
         return response;
     }
     @PostMapping("/send-message")
-    public ResponseEntity<String> sendMessage(@RequestBody JsonObject message) {
+    public ResponseEntity<String> sendMessage(@RequestBody FacebookMessage message) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(HttpHeaders.AUTHORIZATION);
-        HttpEntity<JsonObject> request = new HttpEntity<>(message, headers);
+        headers.setBearerAuth("");
+        HttpEntity<FacebookMessage> request = new HttpEntity<>(message, headers);
         String url = "https://graph.facebook.com/v15.0/107683368889264/messages";
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);

@@ -9,16 +9,22 @@ public class FacebookMessage {
     @Id
     private String id;
     private String messaging_product;
+
+    private String  recipient_type;
     private String to;
     private String type;
     private FacebookMessageTemplate template;
 
-    public FacebookMessage(String id,String messaging_product, String to, String type, FacebookMessageTemplate template) {
+    private FacebookMessageText text;
+
+    public FacebookMessage(String id,String messaging_product, String recipient_type, String to, String type, FacebookMessageTemplate template,FacebookMessageText text) {
         this.id=id;
         this.messaging_product = messaging_product;
+        this.recipient_type=recipient_type;
         this.to = to;
         this.type = type;
         this.template = template;
+        this.text=text;
     }
 
     public FacebookMessage() {
@@ -39,6 +45,14 @@ public class FacebookMessage {
 
     public void setMessaging_product(String messaging_product) {
         this.messaging_product = messaging_product;
+    }
+
+    public String getRecipient_type() {
+        return recipient_type;
+    }
+
+    public void setRecipient_type(String recipient_type) {
+        this.recipient_type = recipient_type;
     }
 
     public String getTo() {
@@ -65,6 +79,13 @@ public class FacebookMessage {
         this.template = template;
     }
 
-    // Constructor, getters and setters
+    public FacebookMessageText getText() {
+        return text;
+    }
+
+    public void setText(FacebookMessageText text) {
+        this.text = text;
+    }
+// Constructor, getters and setters
 }
 
