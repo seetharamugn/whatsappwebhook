@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
+import org.bson.json.JsonObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +24,6 @@ public class WhatsAppWebhookController {
 
     private static final String VERIFY_TOKEN = "1234";
 
-    @Value("${facebook.page-access-token}")
-    private String pageAccessToken;
 
         @GetMapping("/webhook")
         public ResponseEntity<String> verifyWebhook(@RequestParam("hub.mode") String mode,
@@ -53,7 +52,7 @@ public class WhatsAppWebhookController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file, @RequestParam("messageProduct")String messageProduct, @RequestParam("type") String type, @RequestParam("name") String name,@RequestParam("code") String code) {
+    public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file, @RequestParam("messageProduct")String messageProduct, @RequestParam("type") String type, @RequestParam("name") String name,@RequestParam("code") String code,@RequestParam("AccessToken") String authKey) {
         if (file.isEmpty()) {
             return new ResponseEntity<>("Please select a file to upload", HttpStatus.BAD_REQUEST);
         }
@@ -68,7 +67,7 @@ public class WhatsAppWebhookController {
             String[] line;
             while ((line = csvReader.readNext()) != null) {
                 String columnValue = line[columnToRead];
-                this.sendMessage1(columnValue,messageProduct,type,name,code);
+                this.sendBulkMessage(columnValue,messageProduct,type,name,code,authKey);
                 // Process the column value here
                 System.out.println(columnValue);
             }
@@ -86,10 +85,11 @@ public class WhatsAppWebhookController {
         return headerMap;
     }
 
-    public ResponseEntity<String> sendMessage1( String phoneNumber,String messageProduct,String type,String name, String code) {
+    public ResponseEntity<String> sendBulkMessage( String phoneNumber,String messageProduct,String type,String name, String code,String AccessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(pageAccessToken);
+
+        headers.setBearerAuth(AccessToken);
         FacebookMessage message = new FacebookMessage();
         message.setMessaging_product(messageProduct);
         message.setTo(phoneNumber);
@@ -107,11 +107,11 @@ public class WhatsAppWebhookController {
         return response;
     }
     @PostMapping("/send-message")
-    public ResponseEntity<String> sendMessage(@RequestBody FacebookMessage message) {
+    public ResponseEntity<String> sendMessage(@RequestBody JsonObject message) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(pageAccessToken);
-        HttpEntity<FacebookMessage> request = new HttpEntity<>(message, headers);
+        headers.setBearerAuth(HttpHeaders.AUTHORIZATION);
+        HttpEntity<JsonObject> request = new HttpEntity<>(message, headers);
         String url = "https://graph.facebook.com/v15.0/107683368889264/messages";
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
