@@ -3,6 +3,8 @@ package com.example.webhook.services.impl;
 import com.example.webhook.model.MessageLanguage;
 import com.example.webhook.model.MessageTemplate;
 import com.example.webhook.model.TemplateMessage;
+import com.example.webhook.model.TextMessageWithResponse;
+import com.example.webhook.repository.TextMessageRepository;
 import com.example.webhook.services.BulkMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 
 @Service
 public class BulkMessageServiceImpl implements BulkMessageService {
-    //private final String facebookApiUrl = "https://graph.facebook.com/v15.0/107683368889264/messages";
     @Value("${facebook.api.url}")
     private String facebookApiUrl;
 
@@ -31,6 +32,8 @@ public class BulkMessageServiceImpl implements BulkMessageService {
     @Autowired
     private HttpServletRequest request;
 
+    @Autowired
+    private TextMessageRepository textMessageRepository;
     @Override
     public ResponseEntity<String> sendBulkMessage(String phoneNumber) {
         String authorizationHeader = request.getHeader("Authorization");
@@ -50,6 +53,11 @@ public class BulkMessageServiceImpl implements BulkMessageService {
         HttpEntity<TemplateMessage> req = new HttpEntity<>(message, headers);
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.exchange(facebookApiUrl, HttpMethod.POST, req, String.class);
+
+        TextMessageWithResponse textMessageWithResponse = new TextMessageWithResponse();
+        textMessageWithResponse.setTemplateMessage(message);
+        textMessageWithResponse.setApiResponse(response.getBody());
+        textMessageRepository.save(textMessageWithResponse);
         return response;
     }
 }

@@ -1,7 +1,10 @@
 package com.example.webhook.services.impl;
 
 import com.example.webhook.model.TextMessage;
+import com.example.webhook.model.TextMessageWithResponse;
+import com.example.webhook.repository.TextMessageRepository;
 import com.example.webhook.services.SendMessageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -13,6 +16,9 @@ public class SendMessageServiceImpl implements SendMessageService {
 
     @Value("${facebook.api.url}")
     private String facebookApiUrl;
+    @Autowired
+    private TextMessageRepository textMessageRepository;
+
 
     @Override
     public ResponseEntity<String> sendMessage(TextMessage message, String authorizationHeader) {
@@ -23,7 +29,11 @@ public class SendMessageServiceImpl implements SendMessageService {
 
         HttpEntity<TextMessage> request = new HttpEntity<>(message, headers);
         ResponseEntity<String> response = restTemplate.exchange(facebookApiUrl, HttpMethod.POST, request, String.class);
-        System.out.println(response.getStatusCode());
+        TextMessageWithResponse textMessageWithResponse = new TextMessageWithResponse();
+        textMessageWithResponse.setInputMessage(message);
+        textMessageWithResponse.setApiResponse(response.getBody());
+        textMessageRepository.save(textMessageWithResponse);
+
         return response;
     }
 }

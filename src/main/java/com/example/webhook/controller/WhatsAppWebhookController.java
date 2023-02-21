@@ -19,9 +19,6 @@ import java.util.Map;
 @RestController
 public class WhatsAppWebhookController {
     @Autowired
-    private HttpServletRequest request;
-    private final String facebookApiUrl = "https://graph.facebook.com/v15.0/107683368889264/messages";
-    @Autowired
     private  BulkMessageService bulkMessageService;
 
     @Autowired
@@ -29,7 +26,7 @@ public class WhatsAppWebhookController {
 
 
     @GetMapping("/")
-    public String hokme() {
+    public String home() {
         return "welcome to whatsapp integration ";
     }
 
@@ -73,19 +70,5 @@ public class WhatsAppWebhookController {
         }
         return headerMap;
     }
-   /* @PostMapping("/send-message")
-    public ResponseEntity<String> sendMessage(@RequestBody TextMessage message) {
-        RestTemplate restTemplate = new RestTemplate();
-        String authorizationHeader = request.getHeader("Authorization");
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", authorizationHeader);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<TextMessage> request1 = new HttpEntity<>(message, headers);
-
-        ResponseEntity<String> response = restTemplate.exchange(facebookApiUrl, HttpMethod.POST, request1, String.class);
-        return response;
-    }*/
-
 
 }
