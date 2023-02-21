@@ -3,7 +3,6 @@ package com.example.webhook.services.impl;
 import com.example.webhook.model.JwtToken;
 import com.example.webhook.repository.JwtTokenRepository;
 import com.example.webhook.services.JwtTokenService;
-import com.example.webhook.services.UserDetailsImpl;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.json.JSONObject;
@@ -73,16 +72,4 @@ public class JwtTokenServiceImpl implements JwtTokenService {
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
-    @Override
-    public void deleteExpiredTokens() {
-        Instant now = Instant.now();
-        jwtTokenRepository.deleteByExpiryDateBefore(now);
-    }
-
-    @Override
-    public void deleteToken(String token) {
-        jwtTokenRepository.deleteByToken(token);
-    }
-
-
 }

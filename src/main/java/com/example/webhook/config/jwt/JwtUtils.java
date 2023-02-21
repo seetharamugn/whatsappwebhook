@@ -1,10 +1,7 @@
 package com.example.webhook.config.jwt;
 
-import com.example.webhook.model.JwtToken;
 import com.example.webhook.repository.JwtTokenRepository;
-import com.example.webhook.services.UserDetailsImpl;
 import io.jsonwebtoken.*;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +12,6 @@ import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Optional;
 
 @Component
 public class JwtUtils {

@@ -2,7 +2,7 @@ package com.example.webhook.config;
 
 import com.example.webhook.config.jwt.AuthEntryPointJwt;
 import com.example.webhook.config.jwt.AuthTokenFilter;
-import com.example.webhook.services.UserDetailsServiceImpl;
+import com.example.webhook.services.impl.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

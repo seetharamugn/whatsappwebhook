@@ -1,4 +1,4 @@
-package com.example.webhook.services;
+package com.example.webhook.services.impl;
 
 import com.example.webhook.model.User;
 import com.example.webhook.repository.UserRepository;

@@ -18,7 +18,7 @@ import com.example.webhook.repository.RoleRepository;
 import com.example.webhook.repository.UserRepository;
 import com.example.webhook.payload.request.*;
 import com.example.webhook.services.JwtTokenService;
-import com.example.webhook.services.UserDetailsImpl;
+import com.example.webhook.services.impl.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;

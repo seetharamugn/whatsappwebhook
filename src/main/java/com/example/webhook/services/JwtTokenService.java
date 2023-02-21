@@ -1,6 +1,7 @@
 package com.example.webhook.services;
 
 import com.example.webhook.model.JwtToken;
+import com.example.webhook.services.impl.UserDetailsImpl;
 import org.springframework.http.ResponseCookie;
 
 public interface JwtTokenService {
@@ -8,7 +9,4 @@ public interface JwtTokenService {
 
     JwtToken generateJwtToken(UserDetailsImpl userDetails);
 
-    void deleteExpiredTokens();
-
-    void deleteToken(String token);
 }
