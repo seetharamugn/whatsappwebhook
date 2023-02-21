@@ -2,6 +2,7 @@ package com.example.webhook.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,9 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController
-public class WebhookControler {
+public class WebhookController {
 
-    private static final String VERIFY_TOKEN = "1234";
+    @Value("${webhook.token.secret}")
+    private String VERIFY_TOKEN;
     @GetMapping("/webhook")
     public ResponseEntity<String> verifyWebhook(@RequestParam("hub.mode") String mode,
                                                 @RequestParam("hub.verify_token") String token,
