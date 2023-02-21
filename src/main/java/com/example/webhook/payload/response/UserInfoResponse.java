@@ -1,5 +1,7 @@
 package com.example.webhook.payload.response;
 
+import com.example.webhook.model.JwtToken;
+
 import java.util.List;
 
 public class UserInfoResponse {
@@ -8,7 +10,10 @@ public class UserInfoResponse {
   private String email;
   private List<String> roles;
 
-  public UserInfoResponse(String id, String username, String email, List<String> roles) {
+  private JwtToken jwtToken;
+
+  public UserInfoResponse(JwtToken token, String id, String username, String email, List<String> roles) {
+    this.jwtToken=token;
     this.id = id;
     this.username = username;
     this.email = email;
@@ -41,5 +46,13 @@ public class UserInfoResponse {
 
   public List<String> getRoles() {
     return roles;
+  }
+
+  public JwtToken getJwtToken() {
+    return jwtToken;
+  }
+
+  public void setJwtToken(JwtToken jwtToken) {
+    this.jwtToken = jwtToken;
   }
 }

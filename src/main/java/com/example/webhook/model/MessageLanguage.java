@@ -1,6 +1,6 @@
 package com.example.webhook.model;
 
-public class FacebookMessageLanguage {
+public class MessageLanguage {
     private String code;
 
 

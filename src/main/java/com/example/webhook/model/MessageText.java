@@ -1,11 +1,11 @@
 package com.example.webhook.model;
 
-public class FacebookMessageText {
+public class MessageText {
 
     private boolean preview_url;
     private String body;
 
-    public FacebookMessageText(boolean preview_url, String body) {
+    public MessageText(boolean preview_url, String body) {
         this.preview_url = preview_url;
         this.body = body;
     }

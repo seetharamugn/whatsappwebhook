@@ -4,34 +4,34 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "Message")
-public class FacebookMessage {
+public class TemplateMessage {
 
-    @Id
-    private String id;
+ /*   @Id
+    private String id;*/
     private String messaging_product;
     private String to;
     private String type;
-    private FacebookMessageTemplate template;
+    private MessageTemplate template;
 
-    public FacebookMessage(String id,String messaging_product, String to, String type, FacebookMessageTemplate template) {
-        this.id=id;
+    public TemplateMessage( /*String id*/ String messaging_product, String to, String type, MessageTemplate template) {
+        /*this.id=id;*/
         this.messaging_product = messaging_product;
         this.to = to;
         this.type = type;
         this.template = template;
     }
 
-    public FacebookMessage() {
+    public TemplateMessage() {
 
     }
 
-    public String getId() {
+/*    public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
-    }
+    }*/
 
     public String getMessaging_product() {
         return messaging_product;
@@ -57,11 +57,11 @@ public class FacebookMessage {
         this.type = type;
     }
 
-    public FacebookMessageTemplate getTemplate() {
+    public MessageTemplate getTemplate() {
         return template;
     }
 
-    public void setTemplate(FacebookMessageTemplate template) {
+    public void setTemplate(MessageTemplate template) {
         this.template = template;
     }
 

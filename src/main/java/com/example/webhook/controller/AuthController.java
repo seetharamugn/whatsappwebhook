@@ -7,7 +7,9 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import com.example.webhook.config.jwt.JwtUtils;
 import com.example.webhook.model.ERole;
+import com.example.webhook.model.JwtToken;
 import com.example.webhook.model.Role;
 import com.example.webhook.model.User;
 import com.example.webhook.payload.response.MessageResponse;
@@ -15,8 +17,8 @@ import com.example.webhook.payload.response.UserInfoResponse;
 import com.example.webhook.repository.RoleRepository;
 import com.example.webhook.repository.UserRepository;
 import com.example.webhook.payload.request.*;
-import com.example.webhook.security.jwt.*;
-import com.example.webhook.security.services.UserDetailsImpl;
+import com.example.webhook.services.JwtTokenService;
+import com.example.webhook.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -47,6 +49,9 @@ public class AuthController {
     RoleRepository roleRepository;
 
     @Autowired
+    JwtTokenService jwtTokenService;
+
+    @Autowired
     PasswordEncoder encoder;
 
     @Autowired
@@ -62,14 +67,14 @@ public class AuthController {
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
-
+        ResponseCookie jwtCookie = this.jwtTokenService.generateJwtCookie(userDetails);
+        JwtToken token =this.jwtTokenService.generateJwtToken(userDetails);
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .body(new UserInfoResponse(userDetails.getId(),
+                .body(new UserInfoResponse(token,userDetails.getId(),
                         userDetails.getUsername(),
                         userDetails.getEmail(),
                         roles));

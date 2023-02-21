@@ -1,4 +1,4 @@
-package com.example.webhook.security.jwt;
+package com.example.webhook.config.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;

@@ -1,6 +1,6 @@
 package com.example.webhook.model;
 
-public class FacebookTextMessage {
+public class TextMessage {
 
     /*private String id;*/
     private String messaging_product;
@@ -9,9 +9,9 @@ public class FacebookTextMessage {
     private String to;
     private String type;
 
-    private FacebookMessageText text;
+    private MessageText text;
 
-    public FacebookTextMessage(/*String id,*/ String messaging_product, String recipient_type, String to, String type, FacebookMessageText text) {
+    public TextMessage(/*String id,*/ String messaging_product, String recipient_type, String to, String type, MessageText text) {
         /*this.id = id;*/
         this.messaging_product = messaging_product;
         this.recipient_type = recipient_type;
@@ -60,11 +60,11 @@ public class FacebookTextMessage {
         this.type = type;
     }
 
-    public FacebookMessageText getText() {
+    public MessageText getText() {
         return text;
     }
 
-    public void setText(FacebookMessageText text) {
+    public void setText(MessageText text) {
         this.text = text;
     }
 }

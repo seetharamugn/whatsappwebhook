@@ -1,4 +1,4 @@
-package com.example.webhook.security.services;
+package com.example.webhook.services;
 
 import com.example.webhook.model.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;

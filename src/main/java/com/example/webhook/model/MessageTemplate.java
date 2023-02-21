@@ -1,15 +1,15 @@
 package com.example.webhook.model;
 
-public class FacebookMessageTemplate {
+public class MessageTemplate {
     private String name;
-    private FacebookMessageLanguage language;
+    private MessageLanguage language;
 
-    public FacebookMessageTemplate(String name, FacebookMessageLanguage language) {
+    public MessageTemplate(String name, MessageLanguage language) {
         this.name = name;
         this.language = language;
     }
 
-    public FacebookMessageTemplate() {
+    public MessageTemplate() {
 
     }
 
@@ -21,11 +21,11 @@ public class FacebookMessageTemplate {
         this.name = name;
     }
 
-    public FacebookMessageLanguage getLanguage() {
+    public MessageLanguage getLanguage() {
         return language;
     }
 
-    public void setLanguage(FacebookMessageLanguage language) {
+    public void setLanguage(MessageLanguage language) {
         this.language = language;
     }
 }

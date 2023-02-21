@@ -1,19 +1,16 @@
 package com.example.webhook.controller;
 
-import com.example.webhook.model.FacebookMessage;
-import com.example.webhook.model.FacebookMessageLanguage;
-import com.example.webhook.model.FacebookMessageTemplate;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.webhook.model.*;
+import com.example.webhook.services.BulkMessageService;
+import com.example.webhook.services.SendMessageService;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
-import org.bson.json.JsonObject;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -21,38 +18,32 @@ import java.util.Map;
 
 @RestController
 public class WhatsAppWebhookController {
+    @Autowired
+    private HttpServletRequest request;
+    private final String facebookApiUrl = "https://graph.facebook.com/v15.0/107683368889264/messages";
+    @Autowired
+    private  BulkMessageService bulkMessageService;
 
-    private static final String VERIFY_TOKEN = "1234";
+    @Autowired
+    private SendMessageService sendMessageService;
 
-
-        @GetMapping("/webhook")
-        public ResponseEntity<String> verifyWebhook(@RequestParam("hub.mode") String mode,
-                                                    @RequestParam("hub.verify_token") String token,
-                                                    @RequestParam("hub.challenge") String challenge) {
-            if (mode.equals("subscribe") && token.equals(VERIFY_TOKEN)) {
-                return ResponseEntity.ok(challenge);
-            } else {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-        }
 
     @GetMapping("/")
     public String hokme() {
-       return "heelo";
-    }
-    @PostMapping("/webhook")
-    public ResponseEntity<Void> handleIncomingMessage(@RequestBody String messageBody) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode root = mapper.readTree(messageBody);
-        System.out.println( root );
-        // process the incoming message
-        // ...
-
-        return ResponseEntity.ok().build();
+        return "welcome to whatsapp integration ";
     }
 
-    @PostMapping("/upload")
-    public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file, @RequestParam("messageProduct")String messageProduct, @RequestParam("type") String type, @RequestParam("name") String name,@RequestParam("code") String code,@RequestParam("AccessToken") String authKey) {
+    @PostMapping("/send-message")
+    public ResponseEntity<String> sendMessage(@RequestBody TextMessage message, @RequestHeader("Authorization") String authorizationHeader) {
+        ResponseEntity<String> response = sendMessageService.sendMessage(message, authorizationHeader);
+        if (response.getStatusCode() == HttpStatus.OK) {
+            return new ResponseEntity<>("Message sent successfully", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Failed to send message", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PostMapping("/send-bulk-Message")
+    public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             return new ResponseEntity<>("Please select a file to upload", HttpStatus.BAD_REQUEST);
         }
@@ -67,9 +58,7 @@ public class WhatsAppWebhookController {
             String[] line;
             while ((line = csvReader.readNext()) != null) {
                 String columnValue = line[columnToRead];
-                this.sendBulkMessage(columnValue,messageProduct,type,name,code,authKey);
-                // Process the column value here
-                System.out.println(columnValue);
+                bulkMessageService.sendBulkMessage(columnValue);
             }
             return new ResponseEntity<>("File uploaded successfully", HttpStatus.OK);
         } catch (IOException | CsvValidationException e) {
@@ -84,38 +73,19 @@ public class WhatsAppWebhookController {
         }
         return headerMap;
     }
-
-    public ResponseEntity<String> sendBulkMessage( String phoneNumber,String messageProduct,String type,String name, String code,String AccessToken) {
+   /* @PostMapping("/send-message")
+    public ResponseEntity<String> sendMessage(@RequestBody TextMessage message) {
+        RestTemplate restTemplate = new RestTemplate();
+        String authorizationHeader = request.getHeader("Authorization");
         HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", authorizationHeader);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        headers.setBearerAuth(AccessToken);
-        FacebookMessage message = new FacebookMessage();
-        message.setMessaging_product(messageProduct);
-        message.setTo(phoneNumber);
-        message.setType(type);
-        FacebookMessageTemplate template = new FacebookMessageTemplate();
-        template.setName(name);
-        FacebookMessageLanguage language = new FacebookMessageLanguage();
-        language.setCode(code);
-        template.setLanguage(language);
-        message.setTemplate(template);
-        HttpEntity<FacebookMessage> request = new HttpEntity<>(message, headers);
-        String url = "https://graph.facebook.com/v15.0/107683368889264/messages";
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+        HttpEntity<TextMessage> request1 = new HttpEntity<>(message, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(facebookApiUrl, HttpMethod.POST, request1, String.class);
         return response;
-    }
-    @PostMapping("/send-message")
-    public ResponseEntity<String> sendMessage(@RequestBody FacebookMessage message) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth("");
-        HttpEntity<FacebookMessage> request = new HttpEntity<>(message, headers);
-        String url = "https://graph.facebook.com/v15.0/107683368889264/messages";
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-        return response;
-    }
+    }*/
+
 
 }

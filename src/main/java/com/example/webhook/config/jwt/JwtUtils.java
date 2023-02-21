@@ -1,9 +1,13 @@
-package com.example.webhook.security.jwt;
+package com.example.webhook.config.jwt;
 
-import com.example.webhook.security.services.UserDetailsImpl;
+import com.example.webhook.model.JwtToken;
+import com.example.webhook.repository.JwtTokenRepository;
+import com.example.webhook.services.UserDetailsImpl;
 import io.jsonwebtoken.*;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
@@ -11,7 +15,11 @@ import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Optional;
 
 @Component
 public class JwtUtils {
@@ -26,6 +34,9 @@ public class JwtUtils {
   @Value("${webhook.app.jwtCookieName}")
   private String jwtCookie;
 
+  @Autowired
+  private JwtTokenRepository jwtTokenRepository;
+
   public String getJwtFromCookies(HttpServletRequest request) {
     Cookie cookie = WebUtils.getCookie(request, jwtCookie);
     if (cookie != null) {
@@ -33,12 +44,6 @@ public class JwtUtils {
     } else {
       return null;
     }
-  }
-
-  public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
-    String jwt = generateTokenFromUsername(userPrincipal.getUsername());
-    ResponseCookie cookie = ResponseCookie.from(jwtCookie, jwt).path("/api").maxAge(24 * 60 * 60).httpOnly(true).build();
-    return cookie;
   }
 
   public ResponseCookie getCleanJwtCookie() {
@@ -68,13 +73,6 @@ public class JwtUtils {
 
     return false;
   }
-  
-  public String generateTokenFromUsername(String username) {
-    return Jwts.builder()
-        .setSubject(username)
-        .setIssuedAt(new Date())
-        .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-        .signWith(SignatureAlgorithm.HS512, jwtSecret)
-        .compact();
-  }
+
+
 }
