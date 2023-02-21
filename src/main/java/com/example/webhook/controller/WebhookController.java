@@ -1,6 +1,8 @@
 package com.example.webhook.controller;
 
+import com.example.webhook.model.ReceiveMessage;
 import com.example.webhook.model.TextMessageWithResponse;
+import com.example.webhook.repository.MessageRepository;
 import com.example.webhook.repository.TextMessageRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Date;
 
 @RestController
 public class WebhookController {
@@ -18,8 +21,9 @@ public class WebhookController {
     @Value("${webhook.token.secret}")
     private String VERIFY_TOKEN;
 
+
     @Autowired
-    private TextMessageRepository textMessageRepository;
+    private MessageRepository messageRepository;
     @GetMapping("/webhook")
     public ResponseEntity<String> verifyWebhook(@RequestParam("hub.mode") String mode,
                                                 @RequestParam("hub.verify_token") String token,
@@ -36,11 +40,18 @@ public class WebhookController {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(messageBody);
         System.out.println( root );
-        // process the incoming message
-        // ...
-        TextMessageWithResponse textMessageWithResponse = new TextMessageWithResponse();
-        textMessageWithResponse.setApiResponse(root.asText());
-        textMessageRepository.save(textMessageWithResponse);
+        JsonNode entry = root.get("entry").get(0);
+        JsonNode messageNode = entry.get("changes").get(0).get("value").get("messages").get(0);
+
+        ReceiveMessage message = new ReceiveMessage();
+        message.setFrom(messageNode.get("from").asText());
+        message.setTo(entry.get("id").asText());
+        message.setText(messageNode.get("text").get("body").asText());
+        message.setTimestamp(new Date(Long.parseLong(messageNode.get("timestamp").asText()) * 1000));
+
+        messageRepository.save(message);
+
+
         return ResponseEntity.ok().build();
     }
 
