@@ -50,9 +50,6 @@ public class WebhookController {
         message.setTimestamp(new Date(Long.parseLong(messageNode.get("timestamp").asText()) * 1000));
 
         messageRepository.save(message);
-
-        messageRepository.save(message);
-
         return ResponseEntity.ok().build();
     }
 

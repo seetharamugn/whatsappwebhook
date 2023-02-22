@@ -36,7 +36,7 @@ public class BulkMessageServiceImpl implements BulkMessageService {
     @Autowired
     private MessageRepository messageRepository;
     @Override
-    public ResponseEntity<String> sendBulkMessage(String phoneNumber,String mobileId) {
+    public ReceiveMessage sendBulkMessage(String phoneNumber,String mobileId) {
         String authorizationHeader = request.getHeader("Authorization");
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", authorizationHeader);
@@ -55,12 +55,15 @@ public class BulkMessageServiceImpl implements BulkMessageService {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.exchange(facebookApiUrl+mobileId+"/messages", HttpMethod.POST, req, String.class);
 
-        ReceiveMessage receiveMessage = new ReceiveMessage();
-        receiveMessage.setFrom(mobileId);
-        receiveMessage.setTo(message.getTo());
-        receiveMessage.setText(message.getTemplate().getName());
-        receiveMessage.setTimestamp( new Date(System.currentTimeMillis()));
-        messageRepository.save(receiveMessage);
-        return response;
+        if (response.getStatusCode() == HttpStatus.OK) {
+            ReceiveMessage receiveMessage = new ReceiveMessage();
+            receiveMessage.setFrom(mobileId);
+            receiveMessage.setTo(message.getTo());
+            receiveMessage.setText(message.getTemplate().getName());
+            receiveMessage.setTimestamp( new Date(System.currentTimeMillis()));
+            return messageRepository.save(receiveMessage);
+        } else {
+            throw new RuntimeException(response.getBody()) ;
+        }
     }
 }

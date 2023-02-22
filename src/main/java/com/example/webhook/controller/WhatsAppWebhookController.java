@@ -1,6 +1,7 @@
 package com.example.webhook.controller;
 
 import com.example.webhook.dao.TextMessage;
+import com.example.webhook.model.ReceiveMessage;
 import com.example.webhook.services.BulkMessageService;
 import com.example.webhook.services.SendMessageService;
 import com.opencsv.CSVReader;
@@ -30,13 +31,8 @@ public class WhatsAppWebhookController {
     }
 
     @PostMapping("/send-message")
-    public ResponseEntity<String> sendMessage(@RequestBody TextMessage message, @RequestHeader("Authorization") String authorizationHeader, @RequestParam("mobileId") String mobileId) {
-        ResponseEntity<String> response = sendMessageService.sendMessage(message, authorizationHeader,mobileId);
-        if (response.getStatusCode() == HttpStatus.OK) {
-            return new ResponseEntity<>("Message sent successfully", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Failed to send message", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ReceiveMessage sendMessage(@RequestBody TextMessage message, @RequestHeader("Authorization") String authorizationHeader, @RequestParam("mobileId") String mobileId) {
+        return sendMessageService.sendMessage(message, authorizationHeader,mobileId);
     }
     @PostMapping("/send-bulk-Message")
     public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file,@RequestParam("mobileId") String mobileId) {
