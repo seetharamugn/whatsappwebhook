@@ -6,4 +6,6 @@ import org.springframework.http.ResponseEntity;
 
 public interface SendMessageService {
     ReceiveMessage sendMessage(TextMessage message, String authorizationHeader, String mobileId);
+
+    ReceiveMessage getMessage(String from);
 }

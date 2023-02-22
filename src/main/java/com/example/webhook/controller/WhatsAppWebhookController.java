@@ -66,4 +66,8 @@ public class WhatsAppWebhookController {
         return headerMap;
     }
 
+    @GetMapping("/getMessage/{from}")
+    public ReceiveMessage getMessage(@PathVariable String from){
+        return this.sendMessageService.getMessage(from);
+    }
 }

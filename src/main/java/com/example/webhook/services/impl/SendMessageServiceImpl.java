@@ -43,4 +43,13 @@ public class SendMessageServiceImpl implements SendMessageService {
         }
 
     }
+
+    @Override
+    public ReceiveMessage getMessage(String from) {
+        ReceiveMessage receiveMessage = this.messageRepository.findByFrom(from);
+        if(receiveMessage==null){
+            throw new RuntimeException("no message to this number");
+        }
+        return receiveMessage;
+    }
 }
