@@ -1,6 +1,6 @@
 package com.example.webhook.controller;
 
-import com.example.webhook.model.*;
+import com.example.webhook.dao.TextMessage;
 import com.example.webhook.services.BulkMessageService;
 import com.example.webhook.services.SendMessageService;
 import com.opencsv.CSVReader;
@@ -10,7 +10,6 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -31,8 +30,8 @@ public class WhatsAppWebhookController {
     }
 
     @PostMapping("/send-message")
-    public ResponseEntity<String> sendMessage(@RequestBody TextMessage message, @RequestHeader("Authorization") String authorizationHeader) {
-        ResponseEntity<String> response = sendMessageService.sendMessage(message, authorizationHeader);
+    public ResponseEntity<String> sendMessage(@RequestBody TextMessage message, @RequestHeader("Authorization") String authorizationHeader, @RequestParam("mobileId") String mobileId) {
+        ResponseEntity<String> response = sendMessageService.sendMessage(message, authorizationHeader,mobileId);
         if (response.getStatusCode() == HttpStatus.OK) {
             return new ResponseEntity<>("Message sent successfully", HttpStatus.OK);
         } else {
@@ -40,7 +39,7 @@ public class WhatsAppWebhookController {
         }
     }
     @PostMapping("/send-bulk-Message")
-    public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file,@RequestParam("mobileId") String mobileId) {
         if (file.isEmpty()) {
             return new ResponseEntity<>("Please select a file to upload", HttpStatus.BAD_REQUEST);
         }
@@ -55,7 +54,7 @@ public class WhatsAppWebhookController {
             String[] line;
             while ((line = csvReader.readNext()) != null) {
                 String columnValue = line[columnToRead];
-                bulkMessageService.sendBulkMessage(columnValue);
+                bulkMessageService.sendBulkMessage(columnValue,mobileId);
             }
             return new ResponseEntity<>("File uploaded successfully", HttpStatus.OK);
         } catch (IOException | CsvValidationException e) {

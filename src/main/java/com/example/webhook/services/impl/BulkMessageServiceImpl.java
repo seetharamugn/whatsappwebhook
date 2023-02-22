@@ -1,10 +1,10 @@
 package com.example.webhook.services.impl;
 
-import com.example.webhook.model.MessageLanguage;
-import com.example.webhook.model.MessageTemplate;
-import com.example.webhook.model.TemplateMessage;
-import com.example.webhook.model.TextMessageWithResponse;
-import com.example.webhook.repository.TextMessageRepository;
+import com.example.webhook.dao.MessageLanguage;
+import com.example.webhook.dao.MessageTemplate;
+import com.example.webhook.model.ReceiveMessage;
+import com.example.webhook.dao.TemplateMessage;
+import com.example.webhook.repository.MessageRepository;
 import com.example.webhook.services.BulkMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 
 
 @Service
@@ -33,9 +34,9 @@ public class BulkMessageServiceImpl implements BulkMessageService {
     private HttpServletRequest request;
 
     @Autowired
-    private TextMessageRepository textMessageRepository;
+    private MessageRepository messageRepository;
     @Override
-    public ResponseEntity<String> sendBulkMessage(String phoneNumber) {
+    public ResponseEntity<String> sendBulkMessage(String phoneNumber,String mobileId) {
         String authorizationHeader = request.getHeader("Authorization");
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", authorizationHeader);
@@ -52,12 +53,14 @@ public class BulkMessageServiceImpl implements BulkMessageService {
         message.setTemplate(template);
         HttpEntity<TemplateMessage> req = new HttpEntity<>(message, headers);
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.exchange(facebookApiUrl, HttpMethod.POST, req, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(facebookApiUrl+mobileId+"/messages", HttpMethod.POST, req, String.class);
 
-        TextMessageWithResponse textMessageWithResponse = new TextMessageWithResponse();
-        textMessageWithResponse.setTemplateMessage(message);
-        textMessageWithResponse.setApiResponse(response.getBody());
-        textMessageRepository.save(textMessageWithResponse);
+        ReceiveMessage receiveMessage = new ReceiveMessage();
+        receiveMessage.setFrom(mobileId);
+        receiveMessage.setTo(message.getTo());
+        receiveMessage.setText(message.getTemplate().getName());
+        receiveMessage.setTimestamp( new Date(System.currentTimeMillis()));
+        messageRepository.save(receiveMessage);
         return response;
     }
 }

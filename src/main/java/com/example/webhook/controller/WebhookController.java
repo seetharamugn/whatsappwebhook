@@ -1,9 +1,7 @@
 package com.example.webhook.controller;
 
 import com.example.webhook.model.ReceiveMessage;
-import com.example.webhook.model.TextMessageWithResponse;
 import com.example.webhook.repository.MessageRepository;
-import com.example.webhook.repository.TextMessageRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,16 +39,19 @@ public class WebhookController {
         JsonNode root = mapper.readTree(messageBody);
         System.out.println( root );
         JsonNode entry = root.get("entry").get(0);
+        String to = entry.get("changes").get(0).get("value").get("metadata").get("display_phone_number").asText();
+
         JsonNode messageNode = entry.get("changes").get(0).get("value").get("messages").get(0);
 
         ReceiveMessage message = new ReceiveMessage();
         message.setFrom(messageNode.get("from").asText());
-        message.setTo(entry.get("id").asText());
+        message.setTo(to);
         message.setText(messageNode.get("text").get("body").asText());
         message.setTimestamp(new Date(Long.parseLong(messageNode.get("timestamp").asText()) * 1000));
 
         messageRepository.save(message);
 
+        messageRepository.save(message);
 
         return ResponseEntity.ok().build();
     }

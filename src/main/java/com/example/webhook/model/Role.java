@@ -1,6 +1,7 @@
 package com.example.webhook.model;
 
 
+import com.example.webhook.dao.ERole;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 

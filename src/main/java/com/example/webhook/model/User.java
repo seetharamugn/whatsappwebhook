@@ -24,13 +24,15 @@ public class User {
     @Email
     private String email;
 
-    @NotBlank
     @Size(max = 120)
     private String password;
 
     @DBRef
     private Set<Role> roles = new HashSet<>();
 
+    private String mobileID;
+    
+    private String waToken;
     public User() {
     }
 
@@ -39,6 +41,7 @@ public class User {
         this.email = email;
         this.password = password;
     }
+
 
     public String getId() {
         return id;
@@ -78,5 +81,21 @@ public class User {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public String getMobileID() {
+        return mobileID;
+    }
+
+    public void setMobileID(String mobileID) {
+        this.mobileID = mobileID;
+    }
+
+    public String getWaToken() {
+        return waToken;
+    }
+
+    public void setWaToken(String waToken) {
+        this.waToken = waToken;
     }
 }

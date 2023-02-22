@@ -2,13 +2,14 @@ package com.example.webhook.controller;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
 import com.example.webhook.config.jwt.JwtUtils;
-import com.example.webhook.model.ERole;
+import com.example.webhook.dao.ERole;
 import com.example.webhook.model.JwtToken;
 import com.example.webhook.model.Role;
 import com.example.webhook.model.User;
@@ -28,11 +29,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -68,13 +65,13 @@ public class AuthController {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         ResponseCookie jwtCookie = this.jwtTokenService.generateJwtCookie(userDetails);
-        JwtToken token =this.jwtTokenService.generateJwtToken(userDetails);
+        JwtToken token = this.jwtTokenService.generateJwtToken(userDetails);
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .body(new UserInfoResponse(token,userDetails.getId(),
+                .body(new UserInfoResponse(token, userDetails.getId(),
                         userDetails.getUsername(),
                         userDetails.getEmail(),
                         roles));
@@ -133,5 +130,30 @@ public class AuthController {
         userRepository.save(user);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+    }
+
+    @PutMapping("/updateUser/{id}")
+    public User update(@PathVariable("id") String id, @Valid @RequestBody User user) {
+        return userRepository.findById(id)
+                .map(existinguser -> {
+                    existinguser.setUsername(user.getUsername());
+                    existinguser.setEmail(user.getEmail());
+                    existinguser.setMobileID(user.getMobileID());
+                    existinguser.setWaToken(user.getWaToken());
+                    return userRepository.save(existinguser);
+                })
+                .orElseGet(() -> {
+                    return null;
+                });
+    }
+
+    @GetMapping("user/{username}")
+    public Optional<User> getUser(@PathVariable("username") String username){
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if (optionalUser.isPresent()) {
+            return optionalUser;
+        }else{
+            throw new RuntimeException("User not found with username " + username);
+        }
     }
 }
