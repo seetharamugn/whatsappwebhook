@@ -39,7 +39,7 @@ public class WebhookController {
         JsonNode root = mapper.readTree(messageBody);
         System.out.println( root );
         JsonNode entry = root.get("entry").get(0);
-        String to = entry.get("changes").get(0).get("value").get("metadata").get("display_phone_number").asText();
+        String to = entry.get("changes").get(0).get("value").get("metadata").get("phone_number_id").asText();
 
         JsonNode messageNode = entry.get("changes").get(0).get("value").get("messages").get(0);
 
